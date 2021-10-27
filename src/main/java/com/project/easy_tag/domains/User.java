@@ -1,22 +1,23 @@
 package com.project.easy_tag.domains;
 
 import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.util.Set;
 
-@Entity
-@Table(name = "users")
+@Document("users")
 @Data
-public class User implements Serializable {
+public class User {
     @Id
     private String id;
-    private String name;
-    private String userPicture;
+
+    private String fullName;
     private String email;
-    private String locale;
-    private LocalDateTime lastVisit;
+
+    @DBRef
+    private Company company;
+    @DBRef
+    private Set<Role> role;
 }

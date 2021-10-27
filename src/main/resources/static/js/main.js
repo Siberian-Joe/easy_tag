@@ -1,16 +1,9 @@
-import Vue from 'vue';
-import App from 'pages/App.vue';
+import Vue from 'vue'
+import App from 'pages/App.vue'
+import vuetify from "../plugins/vuetify";
 
 new Vue({
-    el:'#app',
+    el: '#app',
+    vuetify,
     render: a => a(App)
-});
-
-// var app = new Vue({
-//     el: '#app',
-//     template: ,
-//     data: {
-//         message: 'Привет, Vue!',
-//         profile: frontendData.profile
-//     }
-// });
+})
