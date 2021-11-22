@@ -5,7 +5,7 @@
 
     <v-main>
       <div class="background d-flex justify-center">
-        <company-menu :company="company"/>
+        <company-menu :company="company" :profile="profile"/>
       </div>
     </v-main>
   </v-app>
@@ -20,7 +20,8 @@ export default {
   },
   data() {
     return {
-      company: frontendCompany
+      company: frontendData.company,
+      profile: frontendData.profile
     }
   }
 }

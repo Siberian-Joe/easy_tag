@@ -1,8 +1,8 @@
 <template>
   <v-card class="menu align-self-center rounded-xl" elevation="15">
     <v-container class="in-menu">
-      <v-row>
-        <v-col cols="auto">
+      <v-row dense>
+        <v-col class="pa-0" cols="auto" v-if="!isAuthorization">
           <v-btn small height="50">
             <v-icon>
               mdi-qrcode-scan
@@ -10,16 +10,10 @@
           </v-btn>
         </v-col>
         <v-spacer/>
-        <v-col cols="auto">
-          <v-speed-dial
-              v-model="fab"
-              direction="left"
-          >
+        <v-col class="pa-0" cols="auto">
+          <v-speed-dial v-model="fab" direction="left" v-if="profile != null">
             <template v-slot:activator>
-              <v-btn
-                  v-model="fab"
-                  fab
-              >
+              <v-btn v-model="fab" fab>
                 <v-icon v-if="fab">
                   mdi-close
                 </v-icon>
@@ -28,95 +22,65 @@
                 </v-icon>
               </v-btn>
             </template>
-            <v-btn
-                fab
-                dark
-                small
-                color="green"
-                @click="editMode = !editMode"
-            >
+            <v-btn fab dark small color="green" @click="editMode = !editMode">
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
-            <v-btn
-                fab
-                dark
-                small
-                color="indigo"
-            >
-              <v-icon>mdi-plus</v-icon>
+            <v-btn fab dark small color="indigo" @click="isAdminPanel = !isAdminPanel">
+              <v-icon>mdi-cogs</v-icon>
             </v-btn>
-            <v-btn
-                fab
-                dark
-                small
-                color="red"
-            >
-              <v-icon>mdi-delete</v-icon>
+            <v-btn fab dark small color="red">
+              <v-icon>mdi-exit-to-app</v-icon>
             </v-btn>
           </v-speed-dial>
+          <v-btn fab v-else @click="changeIsAuthorization">
+            <v-icon v-if="!isAuthorization">
+              mdi-account-circle
+            </v-icon>
+            <v-icon v-else>
+              mdi-close
+            </v-icon>
+          </v-btn>
         </v-col>
       </v-row>
 
-      <v-col class="pa-0">
-        <company-title :name="company.name" :logo="company.logo" :editMode="editMode"/>
-      </v-col>
-      <v-col class="pa-0" align="end" v-if="editMode">
-        <v-btn small icon @click="addItem"><v-icon>mdi-plus</v-icon></v-btn>
-      </v-col>
-      <v-col class="pa-0">
-        <company-information-list :items="items" :editMode="editMode" :saveItem="saveItem" :deleteItem="deleteItem"/>
-      </v-col>
+      <v-container class="pa-0" v-if="!isAuthorization">
+        <v-col class="pa-0">
+          <company-title :name="company.name" :logo="company.logo" :editMode="editMode"/>
+        </v-col>
+        <v-col class="pa-0" align="end" v-if="editMode">
+          <v-btn small icon @click="addItem"><v-icon>mdi-plus</v-icon></v-btn>
+        </v-col>
+        <v-col class="pa-0">
+          <company-information-list :items="items" :editMode="editMode" :saveItem="saveItem" :deleteItem="deleteItem"/>
+        </v-col>
+      </v-container>
+      <v-container class="pa-0" v-else>
+        <user-authorization :profile = "profile" :set-user="setUser" :change-is-authorization="changeIsAuthorization"/>
+      </v-container>
     </v-container>
+
   </v-card>
 </template>
 
 <script>
 import CompanyTitle from './CompanyTitle.vue';
 import CompanyInformationList from "./CompanyInformationList.vue";
+import UserAuthorization from "./UserAuthorization.vue";
 import axios from "axios";
 
 export default {
-  props: ["company"],
+  props: ["company", "profile"],
   components: {
     CompanyTitle,
-    CompanyInformationList
+    CompanyInformationList,
+    UserAuthorization
   },
   data() {
     return {
-      editMode: true,
+      editMode: false,
       fab: false,
-      items: this.makeQueue(this.company.items)
-      // items: [
-      //   {
-      //     id: "0",
-      //     name: "Tik-tok",
-      //     icon: "tik-tok",
-      //     href: "https://vk.com/siberian_joe"
-      //   },
-      //   {
-      //     id: "1",
-      //     name: "Instagram",
-      //     icon: "instagram",
-      //     href: "https://vk.com/siberian_joe"
-      //   },
-      //   {
-      //     id: "2",
-      //     name: "Telegram",
-      //     icon: "telegram",
-      //     href: "https://vk.com/siberian_joe"
-      //   },
-      //   {
-      //     id: "3",
-      //     name: "VK",
-      //     icon: "vkontakte",
-      //     href: "https://vk.com/siberian_joe"
-      //   },
-      //   {
-      //     id: "4",
-      //     name: "Skype",
-      //     icon: "skype",
-      //     href: "skype:live:83c7467ff7689aed"
-      //   }]
+      items: this.makeQueue(this.company.items),
+      isAuthorization: false
     }
   },
   methods: {
@@ -155,6 +119,12 @@ export default {
       for(let i = items.length - 1; i > items.indexOf(item); i--)
         items[i].id = (i - 1).toString();
       items.splice(items.indexOf(item), 1);
+    },
+    changeIsAuthorization() {
+      this.isAuthorization = !this.isAuthorization
+    },
+    setUser(body) {
+      this.user = body
     }
   }
 }
@@ -173,5 +143,6 @@ export default {
 
 .in-menu {
   padding: 30px;
+  /*height: 867px;*/
 }
 </style>

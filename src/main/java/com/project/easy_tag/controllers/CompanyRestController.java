@@ -1,20 +1,15 @@
 package com.project.easy_tag.controllers;
 
 import com.project.easy_tag.domains.Company;
-import com.project.easy_tag.domains.Item;
-import com.project.easy_tag.domains.User;
 import com.project.easy_tag.services.CompanyService;
 import com.project.easy_tag.services.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.List;
-
 @RestController
 @RequestMapping("/company/")
-public class MainRestController {
+public class CompanyRestController {
 
     @Autowired
     private UserService userService;

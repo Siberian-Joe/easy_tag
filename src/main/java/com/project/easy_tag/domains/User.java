@@ -15,9 +15,11 @@ public class User {
 
     private String fullName;
     private String email;
+    private String password;
 
     @DBRef
     private Company company;
+
     @DBRef
     private Set<Role> role;
 }

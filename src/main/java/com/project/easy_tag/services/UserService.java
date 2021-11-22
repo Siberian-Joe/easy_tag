@@ -1,19 +1,22 @@
 package com.project.easy_tag.services;
 
 import com.project.easy_tag.domains.Role;
-import com.project.easy_tag.domains.Roles;
 import com.project.easy_tag.domains.User;
 import com.project.easy_tag.repositories.RoleRepository;
 import com.project.easy_tag.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
@@ -21,12 +24,15 @@ public class UserService {
     @Autowired
     private RoleRepository roleRepository;
 
-    @PostConstruct
-    private void generateRoles() {
-        for (Roles role : Roles.values())
-            if(roleRepository.findByRole(role) == null)
-                roleRepository.save(new Role(role));
-    }
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+//    @PostConstruct
+//    private void generateRoles() {
+//        for (Roles role : Roles.values())
+//            if(roleRepository.findByRole(role) == null)
+//                roleRepository.save(new Role(role));
+//    }
 
     public User findByEmail(String email) {
         return userRepository.findByEmail(email);
@@ -39,8 +45,37 @@ public class UserService {
     public User save(User user) {
         if(userRepository.findByEmail(user.getEmail()) == null) {
 //            user.setRole(Collections.singleton(roleRepository.findByRole(Roles.USER)));
+            Role userRole = roleRepository.findByRole("ADMIN");
+            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+            user.setRole(new HashSet<>(Arrays.asList(userRole)));
             return userRepository.save(user);
         }
         return null;
+    }
+    
+    private List<GrantedAuthority> getUserAuthority(Set<Role> userRoles) {
+        Set<GrantedAuthority> roles = new HashSet<>();
+        userRoles.forEach(role -> {
+            roles.add(new SimpleGrantedAuthority(role.getRole()));
+        });
+        List<GrantedAuthority> grantedAuthorities = new ArrayList<>(roles);
+
+        return grantedAuthorities;
+    }
+
+    private UserDetails buildUserForAuthentication(User user, List<GrantedAuthority> authorities) {
+        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email);
+
+        if (user != null) {
+            List<GrantedAuthority> authorities = getUserAuthority((Set<Role>) user.getRole());
+            return buildUserForAuthentication(user, authorities);
+        }
+        else
+            throw new UsernameNotFoundException("Email not found");
     }
 }
