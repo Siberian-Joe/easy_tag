@@ -54,7 +54,7 @@ export default {
   padding: 30px 0 30px 0;
 }
 .company-title-text {
-  font-family: Montserrat;
+
   font-style: normal;
   font-weight: normal;
   font-size: 30px;

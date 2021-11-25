@@ -1,6 +1,7 @@
 package com.project.easy_tag.services;
 
 import com.project.easy_tag.domains.Role;
+import com.project.easy_tag.domains.Roles;
 import com.project.easy_tag.domains.User;
 import com.project.easy_tag.repositories.RoleRepository;
 import com.project.easy_tag.repositories.UserRepository;
@@ -13,6 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 
 @Service
@@ -27,12 +29,12 @@ public class UserService implements UserDetailsService {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-//    @PostConstruct
-//    private void generateRoles() {
-//        for (Roles role : Roles.values())
-//            if(roleRepository.findByRole(role) == null)
-//                roleRepository.save(new Role(role));
-//    }
+    @PostConstruct
+    private void generateRoles() {
+        for (Roles role : Roles.values())
+            if(roleRepository.findByRole(role) == null)
+                roleRepository.save(new Role(role));
+    }
 
     public User findByEmail(String email) {
         return userRepository.findByEmail(email);
@@ -44,11 +46,12 @@ public class UserService implements UserDetailsService {
 
     public User save(User user) {
         if(userRepository.findByEmail(user.getEmail()) == null) {
-//            user.setRole(Collections.singleton(roleRepository.findByRole(Roles.USER)));
-            Role userRole = roleRepository.findByRole("ADMIN");
+            Role userRole = roleRepository.findByRole(Roles.USER);
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
             user.setRole(new HashSet<>(Arrays.asList(userRole)));
-            return userRepository.save(user);
+            userRepository.save(user);
+            user.setPassword(null);
+            return user;
         }
         return null;
     }
@@ -56,7 +59,7 @@ public class UserService implements UserDetailsService {
     private List<GrantedAuthority> getUserAuthority(Set<Role> userRoles) {
         Set<GrantedAuthority> roles = new HashSet<>();
         userRoles.forEach(role -> {
-            roles.add(new SimpleGrantedAuthority(role.getRole()));
+            roles.add(new SimpleGrantedAuthority(role.getRole().toString()));
         });
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>(roles);
 
@@ -72,7 +75,7 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findByEmail(email);
 
         if (user != null) {
-            List<GrantedAuthority> authorities = getUserAuthority((Set<Role>) user.getRole());
+            List<GrantedAuthority> authorities = getUserAuthority(user.getRole());
             return buildUserForAuthentication(user, authorities);
         }
         else

@@ -11,10 +11,9 @@ public class Role {
     @Id
     private String id;
 
-    private String role;
-//    private Roles role;
-//
-//    public Role(Roles role) {
-//        this.role = role;
-//    }
+    private Roles role;
+
+    public Role(Roles role) {
+        this.role = role;
+    }
 }

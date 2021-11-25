@@ -29,15 +29,23 @@ export default {
         fullName: fullName,
         password: password
       });
-      console.log(email, fullName, password)
       this.changeIsAuthorization();
     },
     signIn(email, password) {
-      axios.post('/', {
-        email: email,
-        password: password
+      // axios.post('/', {
+      //   username: email,
+      //   password: password
+      // }).then(response => {
+      //   console.log(response.data)
+      // });
+      axios('/', {
+        method: 'POST',
+        auth: {
+          username: email,
+          password: password
+        }
       }).then(response => {
-        console.log(response.data)
+        console.log(response)
       });
     }
   }

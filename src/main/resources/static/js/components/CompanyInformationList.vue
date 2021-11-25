@@ -1,7 +1,7 @@
 <template>
   <v-card class="company-info scroll rounded-xl" elevation="5">
     <v-container class="pa-0">
-      <company-list-item v-for="item in items" :key="item.id" :item="item" :editMode="editMode" :saveItem="saveItem" :deleteItem="deleteItem"/>
+      <company-list-item v-for="item in items" :key="item.id" :item="item" :editMode="editMode"/>
     </v-container>
   </v-card>
 </template>
@@ -10,7 +10,7 @@
 import CompanyListItem from "./CompanyListItem.vue";
 
 export default {
-  props: ["items", "editMode", "saveItem", "deleteItem"],
+  props: ["items", "editMode"],
   components: {
     CompanyListItem
   },

@@ -12,14 +12,11 @@ import org.springframework.web.bind.annotation.*;
 public class CompanyRestController {
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private CompanyService companyService;
 
-    @GetMapping
-    public Company company(@RequestParam String name) {
-        return companyService.findByName(name);
+    @GetMapping("/{id}")
+    public Company company(@PathVariable("id") String id) {
+        return companyService.findById(id);
     }
 
     @PostMapping
@@ -41,15 +38,4 @@ public class CompanyRestController {
 
         return companyService.save(companyFromDb);
     }
-
-//    @PutMapping("/setcompany/{id}")
-//    public Company setCompany(@PathVariable("id") User user) {
-//        return companyService.createCompany(user, new Company());
-//    }
-
-//    @PostMapping
-//    public User create(@RequestBody User user) {
-//        return userService.save(user);
-//    }
-
 }

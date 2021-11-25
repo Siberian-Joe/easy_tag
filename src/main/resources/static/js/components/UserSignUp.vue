@@ -1,37 +1,79 @@
 <template>
   <v-container class="pa-0">
-    <v-col class="indent" align="center">
-      <v-text-field dense hide-details outlined label="E-mail" v-model="email" @keyup.enter=""/>
-    </v-col>
-    <v-col class="indent" align="center">
-      <v-text-field dense hide-details outlined label="ФИО" v-model="fullName" @keyup.enter=""/>
-    </v-col>
-    <v-col class="indent" align="center">
-      <v-text-field dense hide-details outlined label="Пароль" v-model="firstPassword" @keyup.enter="" type="password"/>
-    </v-col>
-    <v-col class="indent" align="center">
-      <v-text-field dense hide-details outlined label="Подтверждение пароля" v-model="secondPassword" @keyup.enter="" type="password"/>
-    </v-col>
-    <v-col class="indent-last" align="center">
-      <v-btn class="indent-buttons" @click="clickSignUp">Зарегистрироваться</v-btn>
-    </v-col>
+    <v-row class="navigation-panel" no-gutters>
+      <v-spacer/>
+      <v-col class="pa-0" cols="auto">
+        <router-link custom v-slot="{ href, navigate }" to="/login">
+          <v-btn fab :href="href" @click="navigate">
+            <v-icon>
+              mdi-arrow-left
+            </v-icon>
+          </v-btn>
+        </router-link>
+      </v-col>
+    </v-row>
+    <v-form ref="form" lazy-validation>
+      <v-col class="indent" align="center">
+        <v-text-field dense hide-details="auto" outlined :error-messages="errors" :rules="emailRules" label="E-mail" v-model="email" @keyup.enter=""/>
+      </v-col>
+      <v-col class="indent" align="center">
+        <v-text-field dense hide-details="auto" outlined :rules="fullNameRules" label="ФИО" v-model="fullName" @keyup.enter=""/>
+      </v-col>
+      <v-col class="indent" align="center">
+        <v-text-field dense hide-details="auto" outlined :rules="passwordRules" label="Пароль" v-model="password" @keyup.enter="" type="password"/>
+      </v-col>
+      <v-col class="indent" align="center">
+        <v-text-field dense hide-details="auto" outlined :rules="passwordConfirmRules" label="Подтверждение пароля" v-model="confirmPassword" @keyup.enter="" type="password"/>
+      </v-col>
+      <v-col class="indent-last" align="center">
+        <v-btn class="indent-buttons" @click="signUp">Зарегистрироваться</v-btn>
+      </v-col>
+    </v-form>
   </v-container>
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
-  props:["signUp"],
   data() {
     return {
       email: "",
       fullName: "",
-      firstPassword: "",
-      secondPassword: ""
+      password: "",
+      confirmPassword: "",
+      error: false,
+      errors: [],
+      emailRules: [
+        v => !!v || "Это поле обязательное",
+        v => /^(([^<>()[\]\\.,;:\s@']+(\.[^<>()\\[\]\\.,;:\s@']+)*)|('.+'))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(v) || 'Неверная электронная почта'
+      ],
+      fullNameRules: [
+        v => !!v || "Это поле обязательное",
+      ],
+      passwordRules: [
+        v => !!v || "Это поле обязательное",
+        v => /(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}/.test(v) || 'Пароль должен содержать по крайней мере строчную букву, одну цифру, специальный символ и одну заглавную букву'
+      ],
+      passwordConfirmRules: [
+        v => !!v || "Это поле обязательное",
+        v => v === this.password || "Пароли не совпадают"
+      ]
     }
   },
   methods: {
-    clickSignUp() {
-      this.signUp(this.email,this.fullName, this.secondPassword)
+    signUp() {
+      if(this.$refs.form.validate())
+        axios.post('/user', {
+          email: this.email,
+          fullName: this.fullName,
+          password: this.confirmPassword
+        }).then(response => {
+          if(response.data !== "")
+            this.$router.push("/login");
+          else
+            this.errors.push("Электронная почта уже занята")
+        });
     }
   }
 }
@@ -48,5 +90,9 @@ export default {
 
 .indent-buttons {
   margin: 0 10px 0 10px;
+}
+
+.navigation-panel {
+  padding-bottom: 15px;
 }
 </style>

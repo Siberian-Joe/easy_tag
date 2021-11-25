@@ -8,7 +8,7 @@
       <v-col align-self="center">
         <label class="item-text" v-if="!isEdit"> {{ item.name }} </label>
         <div v-else>
-          <v-text-field class="field" dense hide-details outlined label="Название" v-model="name" @keyup.enter="greenClick"/>
+          <v-text-field class="field" :rules="fieldRules" counter="12" required dense  outlined label="Название" v-model="name" @keyup.enter="greenClick"/>
           <v-text-field class="field" dense hide-details outlined label="Ссылка" v-model="href" @keyup.enter="greenClick"/>
         </div>
       </v-col>
@@ -42,11 +42,17 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
+
 export default {
-  props: ["item", "editMode", "saveItem", "deleteItem"],
+  props: ["item", "editMode"],
   data() {
     return {
       fab: false,
+      fieldRules: [
+          v => !!v || "Имя обязательно",
+          v => v.length <= 12 || 'Имя должно быть не более 12 символов',
+      ],
       isEdit: false,
       name: this.item.name,
       nameTemp: this.item.name,
@@ -55,10 +61,11 @@ export default {
     }
   },
   methods: {
+    ...mapActions(["updateItemAction", "deleteItemAction"]),
     greenClick() {
       if(!this.isEdit)
         this.isEdit = !this.isEdit;
-      else {
+      else if(this.name.length <= 12) {
         this.isEdit = false;
 
         this.nameTemp = this.name;
@@ -70,12 +77,12 @@ export default {
         this.item.name = this.name;
         this.item.href = this.href;
 
-        this.saveItem();
+        this.updateItemAction();
       }
     },
     redClick() {
       if(!this.isEdit)
-        this.deleteItem(this.item);
+        this.deleteItemAction(this.item);
       else {
         this.isEdit = false;
 
@@ -97,7 +104,6 @@ export default {
   padding: 15px;
 }
 .item-text {
-  font-family: Montserrat;
   font-style: normal;
   font-weight: normal;
   font-size: 15px;

@@ -2,32 +2,51 @@
   <v-app>
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
 
     <v-main>
       <div class="background d-flex justify-center">
-        <company-menu :company="company" :profile="profile"/>
+        <v-card class="menu align-self-center rounded-xl" elevation="15">
+          <router-view/>
+        </v-card>
       </div>
     </v-main>
   </v-app>
 </template>
 
 <script>
-import CompanyMenu from "components/CompanyMenu.vue"
+import { mapMutations } from "vuex";
+import axios from "axios";
 
 export default {
-  components: {
-    CompanyMenu
+  mounted() {
+    axios.get("/user/").then(response => {
+      if(response.data !== "")
+        this.setProfileMutation(response.data);
+      else
+        this.setProfileMutation(null);
+    });
   },
-  data() {
-    return {
-      company: frontendData.company,
-      profile: frontendData.profile
-    }
+  methods: {
+    ...mapMutations(["setProfileMutation"])
   }
 }
 </script>
 
 <style>
+.menu {
+  margin: 20px;
+  padding: 30px;
+
+  width: 460px;
+
+  background: #FFFFFF;
+  box-shadow: 0 0 10px 10px rgba(0, 0, 0, 0.8);
+
+  font-family: 'Montserrat', sans-serif;
+}
 .background {
   height: 100%;
   width: 100%;

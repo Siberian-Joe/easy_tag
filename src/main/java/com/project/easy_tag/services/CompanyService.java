@@ -16,8 +16,8 @@ public class CompanyService {
     @Autowired
     UserRepository userRepository;
 
-    public Company findByName(String name) {
-        return companyRepository.findByName(name);
+    public Company findById(String id) {
+        return companyRepository.findById(id).orElse(null);
     }
 
     public Company createCompany(User user, Company company) {
