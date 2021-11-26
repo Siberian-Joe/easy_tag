@@ -17,7 +17,6 @@
         <v-card-text v-text="'Неверный E-mail или пароль'"/>
       </v-container>
     </v-card>
-
     <form method="post" action="/login">
       <v-col class="indent" align="center">
         <v-text-field  id="username" name="username" dense hide-details outlined label="E-mail" v-model="email" @keyup.enter=""/>
@@ -37,17 +36,11 @@
 
 <script>
 export default {
-  props:["changeIsSignUp", "setUser", "signIn"],
   data() {
     return {
       email: "",
       password: ""
     }
-  },
-  methods: {
-    // clickSignIn() {
-    //   this.signIn(this.email, this.password)
-    // }
   }
 }
 </script>

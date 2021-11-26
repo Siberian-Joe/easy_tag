@@ -8,7 +8,7 @@
 
     <v-main>
       <div class="background d-flex justify-center">
-        <v-card class="menu align-self-center rounded-xl" elevation="15">
+        <v-card :class="'menu align-self-center rounded-xl ' + (this.$route.fullPath === '/adminpanel' ? 'extended-menu' : '')" elevation="15">
           <router-view/>
         </v-card>
       </div>
@@ -17,21 +17,8 @@
 </template>
 
 <script>
-import { mapMutations } from "vuex";
-import axios from "axios";
 
 export default {
-  mounted() {
-    axios.get("/user/").then(response => {
-      if(response.data !== "")
-        this.setProfileMutation(response.data);
-      else
-        this.setProfileMutation(null);
-    });
-  },
-  methods: {
-    ...mapMutations(["setProfileMutation"])
-  }
 }
 </script>
 
@@ -51,5 +38,9 @@ export default {
   height: 100%;
   width: 100%;
   background-color: #202548;
+}
+
+.extended-menu {
+  width: 920px;
 }
 </style>

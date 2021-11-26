@@ -13,6 +13,7 @@ public class Company {
     private String id;
 
     private String name;
+    private String logo;
 
     private Set<Item> items;
 }

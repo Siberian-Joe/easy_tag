@@ -42,9 +42,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .formLogin().loginPage("/login").failureUrl("/login?error=true").and()
+                .authorizeRequests().antMatchers("/adminpanel").hasAuthority("ADMIN").and()
                 .logout().logoutSuccessUrl("/").and()
-                .authorizeRequests().antMatchers("/", "/js/**", "/error**", "/img/**", "/logos/**", "/company/**", "/user/**", "/login**").permitAll().anyRequest().authenticated()
-                .and().httpBasic()
+                .authorizeRequests().antMatchers("/", "/js/**", "/error**", "/img/**", "/company/**", "/user/**", "/login**").permitAll().anyRequest().authenticated()
+                .and()
+                .httpBasic()
                 .and().sessionManagement().disable();
     }
 }

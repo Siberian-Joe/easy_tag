@@ -60,6 +60,14 @@ export default {
       hrefTemp: this.item.href
     }
   },
+  watch: {
+    item(newItem) {
+      this.name = newItem.name;
+      this.nameTemp = newItem.name;
+      this.href = newItem.href;
+      this.hrefTemp = newItem.href;
+    }
+  },
   methods: {
     ...mapActions(["updateItemAction", "deleteItemAction"]),
     greenClick() {

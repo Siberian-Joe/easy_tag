@@ -2,6 +2,7 @@ package com.project.easy_tag.controllers;
 
 import com.project.easy_tag.domains.User;
 import com.project.easy_tag.services.UserService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,5 +30,11 @@ public class UserRestController {
     @PostMapping
     public User create(@RequestBody User user) {
         return userService.save(user);
+    }
+
+    @PutMapping("/{id}")
+    public User update(@PathVariable("id") User userFromDb, @RequestBody User user) {
+        BeanUtils.copyProperties(user, userFromDb, "id", "password", "role");
+        return userService.update(userFromDb);
     }
 }

@@ -55,6 +55,10 @@ public class UserService implements UserDetailsService {
         }
         return null;
     }
+
+    public User update(User user) {
+        return userRepository.save(user);
+    }
     
     private List<GrantedAuthority> getUserAuthority(Set<Role> userRoles) {
         Set<GrantedAuthority> roles = new HashSet<>();
