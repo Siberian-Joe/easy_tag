@@ -42,16 +42,18 @@ export default {
   },
   async mounted() {
     await this.getProfileFromServer();
-    await this.getCompanyFromServer(this.getProfile.company.id);
+    if(this.getProfile.company !== null)
+      await this.getCompanyFromServer(this.getProfile.company.id);
+    else {
+      await this.getCompanyFromServer();
+      await this.$router.push({name: "company"});
+    }
   },
   computed: {
     ...mapGetters(["getCompany", "getProfile"])
   },
   methods: {
     ...mapActions(["getCompanyFromServer", "addItemAction", "getProfileFromServer"]),
-    changeEditMode() {
-
-    },
     addItem() {
       this.addItemAction({ id: this.getCompany.items.length, name: "Новый элемент", icon: null })
     }

@@ -21,6 +21,14 @@
               </v-icon>
             </v-btn>
           </template>
+          <router-link custom v-slot="{ href, navigate }" to="/adminpanel">
+            <v-btn fab dark small color="orange" :href="href" @click="navigate" v-if="getProfile.company !== null">
+              <v-icon>mdi-cogs</v-icon>
+            </v-btn>
+          </router-link>
+          <v-btn fab dark small color="#755D9A" @click="toMyPage" v-if="getProfile.company !== null">
+            <v-icon>mdi-application</v-icon>
+          </v-btn>
           <router-link custom v-slot="{ href, navigate }" to="/edit">
             <v-btn fab dark small color="green" :href="href" @click="navigate" v-if="getProfile.company !== null">
               <v-icon>mdi-pencil</v-icon>
@@ -28,7 +36,7 @@
           </router-link>
           <router-link custom v-slot="{ href, navigate }" to="/settings">
             <v-btn fab dark small color="indigo" :href="href" @click="navigate">
-              <v-icon>mdi-cogs</v-icon>
+              <v-icon>mdi-account-cog</v-icon>
             </v-btn>
           </router-link>
           <v-btn fab dark small color="red" href="/logout">
@@ -85,6 +93,10 @@ export default {
     ...mapActions(["getCompanyFromServer", "getProfileFromServer", "addItemAction"]),
     addItem() {
       this.addItemAction({ id: this.company.items.length, name: "Новый элемент", icon: null })
+    },
+    toMyPage() {
+      this.$router.push({query: {company: this.getProfile.company.id}})
+      this.getCompanyFromServer(this.$route.query.company);
     }
   }
 }

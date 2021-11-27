@@ -1,9 +1,11 @@
 package com.project.easy_tag.controllers;
 
 import com.project.easy_tag.domains.User;
+import com.project.easy_tag.repositories.RoleRepository;
 import com.project.easy_tag.services.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -15,16 +17,12 @@ public class UserRestController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private RoleRepository roleRepository;
+
     @GetMapping
     public User profile(@AuthenticationPrincipal UserDetails userDetails) {
-        User user = null;
-
-        if(userDetails != null) {
-            user = userService.findByEmail(userDetails.getUsername());
-            user.setPassword(null);
-        }
-
-        return user;
+        return userDetails != null ? userService.findByEmail(userDetails.getUsername()) : null;
     }
 
     @PostMapping
@@ -36,5 +34,18 @@ public class UserRestController {
     public User update(@PathVariable("id") User userFromDb, @RequestBody User user) {
         BeanUtils.copyProperties(user, userFromDb, "id", "password", "role");
         return userService.update(userFromDb);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @DeleteMapping("/{id}")
+    public User delete(@PathVariable("id") User user) {
+        return userService.delete(user);
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PutMapping("/role/{id}")
+    public User updateRole(@PathVariable("id") User userFromDb, @RequestParam String id) {
+        System.out.println(id);
+        return userService.updateRole(userFromDb, roleRepository.findById(id).orElse(null));
     }
 }

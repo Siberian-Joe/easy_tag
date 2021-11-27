@@ -8,7 +8,9 @@ Vue.use(Vuex)
 export default new Vuex.Store({
     state: {
         company: { },
-        profile: { }
+        profile: { },
+        users: null,
+        roles: null
     },
     getters: {
         getCompany(state) {
@@ -16,6 +18,12 @@ export default new Vuex.Store({
         },
         getProfile(state) {
             return state.profile;
+        },
+        getUsers(state) {
+            return state.users;
+        },
+        getRoles(state) {
+            return state.roles;
         }
     },
     mutations: {
@@ -60,7 +68,17 @@ export default new Vuex.Store({
                     ...state.company.items.slice(deletionIndex + 1)
                 ]
             }
-        }
+        },
+        setUsersMutation(state, users) {
+            users.forEach(user => {
+                user.role = user.role.role;
+            });
+
+            state.users = users;
+        },
+        setRolesMutation(state, roles) {
+            state.roles = roles;
+        },
     },
     actions: {
         async setCompanyNameAction({ commit, state }, name) {
@@ -90,6 +108,12 @@ export default new Vuex.Store({
                 company: state.profile.company
             });
             commit( "setEmailMutation", email);
+        },
+        async updateUserRoleAction({ commit }, user) {
+            await axios.put('/user/role/' + user.id + '/?id=' + user.role.id);
+        },
+        async deleteUserAction({ commit }, id) {
+            await axios.delete('/user/' + id);
         },
         async addItemAction({ commit, state }, item) {
             commit( "addItemMutation", item);
@@ -129,6 +153,21 @@ export default new Vuex.Store({
                     router.push({ name: "pageNotFound" })
                 else
                     commit("setCompanyMutation", response.data);
+            });
+        },
+        async getUsersFromServer({ commit }) {
+            await axios.get("/adminpanel/users").then(response => {
+                let users = response.data;
+
+                users.forEach(user => {
+                    user.role = user.role.shift();
+                });
+                commit("setUsersMutation", response.data);
+            });
+        },
+        async getRolesFromServer({ commit }) {
+            await axios.get("/adminpanel/roles").then(response => {
+                commit("setRolesMutation", response.data);
             });
         }
     }

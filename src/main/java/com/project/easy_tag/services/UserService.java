@@ -37,11 +37,17 @@ public class UserService implements UserDetailsService {
     }
 
     public User findByEmail(String email) {
-        return userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email);
+        user.setPassword(null);
+        return user;
     }
 
     public List<User> findAll() {
-        return userRepository.findAll();
+        List<User> users = userRepository.findAll();
+
+        for (User user:users)
+            user.setPassword(null);
+        return users;
     }
 
     public User save(User user) {
@@ -57,9 +63,29 @@ public class UserService implements UserDetailsService {
     }
 
     public User update(User user) {
-        return userRepository.save(user);
+        User newUser = userRepository.save(user);
+
+        newUser.setPassword(null);
+
+        return newUser;
     }
-    
+
+    public User updateRole(User user, Role role) {
+        if(role != null) {
+            user.setRole(new HashSet<>(Arrays.asList(role)));
+            User newUser = userRepository.save(user);
+            newUser.setPassword(null);
+            return newUser;
+        }
+        else
+            return null;
+    }
+
+    public User delete(User user) {
+        userRepository.delete(user);
+        return userRepository.findByEmail(user.getEmail());
+    }
+
     private List<GrantedAuthority> getUserAuthority(Set<Role> userRoles) {
         Set<GrantedAuthority> roles = new HashSet<>();
         userRoles.forEach(role -> {
