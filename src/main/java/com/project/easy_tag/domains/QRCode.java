@@ -2,22 +2,17 @@ package com.project.easy_tag.domains;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Set;
-
-@Document("companies")
+@Document("qr_codes")
 @Data
-public class Company {
+public class QRCode {
     @Id
     private String id;
 
     private String name;
-    private String logo;
 
-    private Set<Item> items;
-
-    @DBRef
-    private QRCode qrCode;
+    public QRCode(String name) {
+        this.name = name;
+    }
 }

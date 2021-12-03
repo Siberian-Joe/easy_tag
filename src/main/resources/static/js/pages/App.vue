@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
 
     <v-main>
-      <div class="background d-flex justify-center">
+      <div class="background font d-flex justify-center">
         <v-card :class="'menu align-self-center rounded-xl ' + (this.$route.fullPath === '/adminpanel' ? 'extended-menu' : '')" elevation="15">
           <router-view/>
         </v-card>
@@ -17,8 +17,17 @@
 </template>
 
 <script>
+import { mapActions } from "vuex"
 
 export default {
+  async mounted() {
+    await this.getProfileFromServer();
+    await this.getCompanyFromServer(this.$route.query.company);
+
+  },
+  methods: {
+    ...mapActions(["getProfileFromServer", "getCompanyFromServer"])
+  }
 }
 </script>
 
@@ -31,13 +40,15 @@ export default {
 
   background: #FFFFFF;
   box-shadow: 0 0 10px 10px rgba(0, 0, 0, 0.8);
-
-  font-family: 'Montserrat', sans-serif;
 }
 .background {
   height: 100%;
   width: 100%;
   background-color: #202548;
+}
+
+.font {
+  font-family: 'Montserrat', sans-serif;
 }
 
 .extended-menu {

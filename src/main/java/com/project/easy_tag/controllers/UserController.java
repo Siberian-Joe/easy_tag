@@ -1,5 +1,6 @@
 package com.project.easy_tag.controllers;
 
+import com.project.easy_tag.domains.Request;
 import com.project.easy_tag.domains.User;
 import com.project.easy_tag.repositories.RoleRepository;
 import com.project.easy_tag.services.UserService;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
-public class UserRestController {
+public class UserController {
 
     @Autowired
     private UserService userService;
@@ -23,6 +24,11 @@ public class UserRestController {
     @GetMapping
     public User profile(@AuthenticationPrincipal UserDetails userDetails) {
         return userDetails != null ? userService.findByEmail(userDetails.getUsername()) : null;
+    }
+
+    @GetMapping("/request/{id}")
+    public User request(@PathVariable("id") Request request) {
+        return userService.findByRequest(request);
     }
 
     @PostMapping
@@ -45,7 +51,6 @@ public class UserRestController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/role/{id}")
     public User updateRole(@PathVariable("id") User userFromDb, @RequestParam String id) {
-        System.out.println(id);
-        return userService.updateRole(userFromDb, roleRepository.findById(id).orElse(null));
+        return userService.updateRole(userFromDb, id);
     }
 }

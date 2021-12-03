@@ -24,6 +24,9 @@ export default new Vuex.Store({
         },
         getRoles(state) {
             return state.roles;
+        },
+        getPermissions(state) {
+            return state.profile.role !== undefined ? state.profile.role.shift().role === "ADMIN" : false;
         }
     },
     mutations: {
@@ -37,6 +40,9 @@ export default new Vuex.Store({
             company.items = newItems;
             document.title = company.name;
             state.company = company;
+        },
+        setUserCompany(state, company) {
+            state.profile.company = company;
         },
         setProfileMutation(state, profile) {
             state.profile = profile;
@@ -79,6 +85,9 @@ export default new Vuex.Store({
         setRolesMutation(state, roles) {
             state.roles = roles;
         },
+        updateRequest(state, request) {
+            state.profile.request = request;
+        }
     },
     actions: {
         async setCompanyNameAction({ commit, state }, name) {
@@ -112,6 +121,22 @@ export default new Vuex.Store({
         async updateUserRoleAction({ commit }, user) {
             await axios.put('/user/role/' + user.id + '/?id=' + user.role.id);
         },
+        async updateUserCompany({ commit, state }, body) {
+            let company;
+            await axios.post('/company/create/' + body.user.id, {
+                id: body.user.company.id,
+                name: body.user.company.name,
+                items: body.user.company.items
+            }).then(response => {
+                company = response.data;
+            });
+            if(body.user.id === state.profile.id)
+                commit( "setUserCompany", body.user.company);
+            await axios.get('/genrateQRCode/' + company.id + "/?path=" + body.path + "/?company=");
+        },
+        async deleteCompany({ commit }, user) {
+            await axios.delete('/company/' + user.id);
+        },
         async deleteUserAction({ commit }, id) {
             await axios.delete('/user/' + id);
         },
@@ -130,12 +155,24 @@ export default new Vuex.Store({
                 items: state.company.items
             });
         },
+        async sendResponse({ state }, response) {
+            await axios.post('/response/' + response.request.id + "/?type=" + response.type, {
+                "description": response.description
+            });
+        },
         async deleteItemAction({ commit, state }, item) {
             commit( "deleteItemMutation", item);
             await axios.put('/company/' + state.company.id, {
                 id: state.company.id,
                 name: state.company.name,
                 items: state.company.items
+            });
+        },
+        async postRequest({ commit, state }, request) {
+            await axios.post('/request/' + state.profile.id + '/?type=' + request.type, {
+                description: request.description
+            }).then(response => {
+                commit("updateRequest", response.data);
             });
         },
         async getProfileFromServer({ commit }) {
@@ -169,6 +206,18 @@ export default new Vuex.Store({
             await axios.get("/adminpanel/roles").then(response => {
                 commit("setRolesMutation", response.data);
             });
-        }
+        },
+        async getRequestsFromServer({ commit }) {
+            await axios.get("/adminpanel/requests").then(response => {
+                const requests = response.data;
+                requests.forEach(request => {
+                    if(request.request.type.type === "CREATE")
+                        request.request.type = "Создание компании";
+                    else
+                        request.request.type = "Вопрос";
+                });
+                commit("setUsersMutation", requests);
+            });
+        },
     }
 })

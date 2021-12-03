@@ -4,7 +4,7 @@ import UserSignUp from "./pages/UserSignUp.vue";
 import NotFoundComponent from "./pages/NotFoundComponent.vue";
 import CompanyMenu from "./pages/CompanyMenu.vue";
 import AdminPanel from "./pages/AdminPanel.vue";
-import SettingsPanel from "./pages/SettingsPanel.vue";
+import ProfilePanel from "./pages/ProfilePanel.vue";
 import EditCompany from "./pages/EditCompany.vue";
 
 export default new VueRouter({
@@ -19,8 +19,8 @@ export default new VueRouter({
            component: AdminPanel
        },
        {
-           path: "/settings",
-           component: SettingsPanel
+           path: "/profile",
+           component: ProfilePanel
        },
        {
            path: "/edit",

@@ -21,5 +21,11 @@ public class User {
     private Company company;
 
     @DBRef
+    private Request request;
+
+    @DBRef
+    private Response response;
+
+    @DBRef
     private Set<Role> role;
 }

@@ -1,5 +1,6 @@
 package com.project.easy_tag.services;
 
+import com.project.easy_tag.domains.Request;
 import com.project.easy_tag.domains.Role;
 import com.project.easy_tag.domains.Roles;
 import com.project.easy_tag.domains.User;
@@ -22,10 +23,8 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private RoleRepository roleRepository;
-
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -42,6 +41,20 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
+    public User findByRequest(Request request) {
+        List<User> users = userRepository.findAllByRequestNotNull();
+        User rightUser = null;
+
+        for(User user : users)
+            if (user.getRequest().equals(request)) {
+                rightUser = user;
+                rightUser.setPassword(null);
+                break;
+            }
+
+        return rightUser;
+    }
+
     public List<User> findAll() {
         List<User> users = userRepository.findAll();
 
@@ -54,7 +67,7 @@ public class UserService implements UserDetailsService {
         if(userRepository.findByEmail(user.getEmail()) == null) {
             Role userRole = roleRepository.findByRole(Roles.USER);
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-            user.setRole(new HashSet<>(Arrays.asList(userRole)));
+            user.setRole(new HashSet<>(Collections.singletonList(userRole)));
             userRepository.save(user);
             user.setPassword(null);
             return user;
@@ -70,15 +83,12 @@ public class UserService implements UserDetailsService {
         return newUser;
     }
 
-    public User updateRole(User user, Role role) {
-        if(role != null) {
-            user.setRole(new HashSet<>(Arrays.asList(role)));
-            User newUser = userRepository.save(user);
-            newUser.setPassword(null);
-            return newUser;
-        }
-        else
-            return null;
+    public User updateRole(User user, String id) {
+        user.setRole(new HashSet<>(Collections.singletonList(roleRepository.findById(id).orElseThrow())));
+        User newUser = userRepository.save(user);
+        newUser.setPassword(null);
+
+        return newUser;
     }
 
     public User delete(User user) {
@@ -88,12 +98,9 @@ public class UserService implements UserDetailsService {
 
     private List<GrantedAuthority> getUserAuthority(Set<Role> userRoles) {
         Set<GrantedAuthority> roles = new HashSet<>();
-        userRoles.forEach(role -> {
-            roles.add(new SimpleGrantedAuthority(role.getRole().toString()));
-        });
-        List<GrantedAuthority> grantedAuthorities = new ArrayList<>(roles);
+        userRoles.forEach(role -> roles.add(new SimpleGrantedAuthority(role.getRole().toString())));
 
-        return grantedAuthorities;
+        return new ArrayList<>(roles);
     }
 
     private UserDetails buildUserForAuthentication(User user, List<GrantedAuthority> authorities) {

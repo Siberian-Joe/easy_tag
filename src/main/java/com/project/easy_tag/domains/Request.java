@@ -5,19 +5,15 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Set;
-
-@Document("companies")
+@Document("requests")
 @Data
-public class Company {
+public class Request {
+
     @Id
-    private String id;
+    String id;
 
-    private String name;
-    private String logo;
-
-    private Set<Item> items;
+    String description;
 
     @DBRef
-    private QRCode qrCode;
+    TypeOfRequest type;
 }
