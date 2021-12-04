@@ -11,6 +11,7 @@ public class Role {
     @Id
     private String id;
 
+    private String name;
     private Roles role;
 
     public Role(Roles role) {

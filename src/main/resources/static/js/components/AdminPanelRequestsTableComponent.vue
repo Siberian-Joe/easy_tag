@@ -7,13 +7,13 @@
     <template v-slot:top>
       <v-dialog
           v-model="dialog"
-          persistent
+          :persistent="loading"
           width="290"
       >
         <template v-slot:activator="{ on, attrs }">
           <v-btn small icon v-bind="attrs" v-on="on"><v-icon>mdi-plus</v-icon></v-btn>
         </template>
-        <v-card class="indent">
+        <v-card class="indent" :loading="loading" :disabled="loading">
           <v-main>
             <v-card-title class="indent-bottom">
               <span class="text-h5">Создание ответа</span>
@@ -72,8 +72,9 @@ export default {
       users: [],
       dialog: false,
       accepted: false,
-      description: "",
       disabled: false,
+      loading: false,
+      description: "",
       headers: [
         {
           text: "ФИО",
@@ -82,7 +83,7 @@ export default {
         },
         { text: "E-mail", value: "email" },
         { text: "Описание", value: "request.description" },
-        { text: "Тип", value: "request.type" },
+        { text: "Тип", value: "request.type.name" },
         { text: "Операции", value: "actions", sortable: false }
       ],
       editedIndex: -1,
@@ -108,7 +109,7 @@ export default {
   methods: {
     ...mapActions(["getRequestsFromServer", "sendResponse", "updateUserCompany"]),
     editItem (item) {
-      if(item.request.type === "Создание компании")
+      if(item.request.type.type === "CREATE")
         this.disabled = false;
       else
         this.disabled = true;
@@ -124,11 +125,13 @@ export default {
         this.editedIndex = -1
       })
       this.accepted = false;
+      this.loading = false;
       this.description = "";
     },
     async save () {
+      this.loading = true;
       let type;
-      if(this.users[this.editedIndex].request.type === "Создание компании" ) {
+      if(this.users[this.editedIndex].request.type.type === "CREATE" ) {
         if(this.accepted) {
           type = "ACCEPTED";
           this.users[this.editedIndex].company = { name: "Название", items: []};

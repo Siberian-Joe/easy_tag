@@ -11,6 +11,7 @@ public class TypeOfRequest {
     @Id
     private String id;
 
+    private String name;
     private TypesOfRequest type;
 
     public TypeOfRequest(TypesOfRequest type) {

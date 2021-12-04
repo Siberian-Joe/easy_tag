@@ -20,10 +20,9 @@
 import { mapActions } from "vuex"
 
 export default {
-  async mounted() {
-    await this.getProfileFromServer();
-    await this.getCompanyFromServer(this.$route.query.company);
-
+  mounted() {
+    this.getProfileFromServer();
+    this.getCompanyFromServer(this.$route.query.company);
   },
   methods: {
     ...mapActions(["getProfileFromServer", "getCompanyFromServer"])

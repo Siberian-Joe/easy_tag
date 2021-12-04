@@ -18,9 +18,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private RoleRepository roleRepository;
-
     @GetMapping
     public User profile(@AuthenticationPrincipal UserDetails userDetails) {
         return userDetails != null ? userService.findByEmail(userDetails.getUsername()) : null;

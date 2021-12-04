@@ -4,7 +4,7 @@
       <v-col class="pa-0" cols="auto">
         <v-dialog
             v-model="dialog"
-            width="490"
+            width="550"
         >
           <template v-slot:activator="{ on, attrs }">
             <v-btn fab v-bind="attrs" v-on="on">
@@ -13,11 +13,11 @@
               </v-icon>
             </v-btn>
           </template>
-          <v-card class="indent">
+          <v-card class="indent-qr rounded-xl">
             <v-main>
               <v-card-text class="pa-0">
                 <v-container class="pa-0">
-                  <v-img class="pa-0" :src="'/img/qrcodes/' + getCompany.id + '.png'"></v-img>
+                  <v-img class="pa-0" :src="'/qrcode/' + getCompany.qrCode.name" v-if="getCompany.qrCode !== undefined"/>
                 </v-container>
               </v-card-text>
             </v-main>
@@ -108,8 +108,10 @@ export default {
       this.addItemAction({ id: this.company.items.length, name: "Новый элемент", icon: null })
     },
     toMyPage() {
-      this.$router.push({query: {company: this.getProfile.company.id}})
-      this.getCompanyFromServer(this.$route.query.company);
+      if(this.$route.query.company !== this.getProfile.company.id) {
+        this.$router.push({query: {company: this.getProfile.company.id}})
+        this.getCompanyFromServer(this.$route.query.company);
+      }
     }
   }
 }
@@ -120,7 +122,7 @@ export default {
   margin-top: 30px
 }
 
-.indent-top-bottom {
-  padding: 15px 0 15px 0;
+.indent-qr {
+  padding: 30px 30px 30px 30px;
 }
 </style>

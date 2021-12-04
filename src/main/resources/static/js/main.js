@@ -4,7 +4,7 @@ import vuetify from "../plugins/vuetify";
 import '@babel/polyfill'
 import store from "./store/store";
 import VueRouter from "vue-router";
-import router from "./router";
+import router from "./router/router";
 
 Vue.use(VueRouter);
 

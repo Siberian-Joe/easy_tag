@@ -1,6 +1,5 @@
 package com.project.easy_tag.services;
 
-
 import com.project.easy_tag.domains.Request;
 import com.project.easy_tag.domains.TypeOfRequest;
 import com.project.easy_tag.domains.TypesOfRequest;
@@ -38,6 +37,10 @@ public class RequestService {
             user.setPassword(null);
 
         return users;
+    }
+
+    public List<TypeOfRequest> findAllTypes() {
+        return typeOfRequestRepository.findAll();
     }
 
     public Request save(String id,String type, Request request) {

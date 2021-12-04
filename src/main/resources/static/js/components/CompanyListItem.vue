@@ -1,41 +1,97 @@
 <template>
   <v-card class="item rounded-xl" elevation="5" :href="editMode ? null : item.href">
-    <v-row class="in-item pa-0" no-gutters>
-      <v-col cols="auto">
+    <v-row class="in-item pa-0" no-gutters >
+      <v-col class="pa-0" cols="auto" tile>
         <v-img class="icon icon-block" size="40" :src="'/img/'+ item.icon + '.svg'" v-if="item.icon !== null"/>
         <v-icon class="icon icon-block" color="black" size="40" v-else>mdi-web</v-icon>
       </v-col>
-      <v-col align-self="center">
-        <label class="item-text" v-if="!isEdit"> {{ item.name }} </label>
-        <div v-else>
-          <v-text-field class="field" :rules="fieldRules" counter="12" required dense  outlined label="Название" v-model="name" @keyup.enter="greenClick"/>
-          <v-text-field class="field" dense hide-details outlined label="Ссылка" v-model="href" @keyup.enter="greenClick"/>
-        </div>
+      <v-col class="pa-0" cols="8" align-self="center" tile>
+        <label class="item-text"> {{ item.name }} </label>
       </v-col>
       <v-col v-if="editMode" cols="auto" align-self="center">
-        <v-speed-dial class="edit-button" v-model="fab" direction="left">
-          <template v-slot:activator>
-            <v-btn v-model="fab" small icon>
-              <v-icon v-if="fab">
-                mdi-close
-              </v-icon>
-              <v-icon v-else-if="isEdit">
-                mdi-pencil
-              </v-icon>
-              <v-icon v-else>
-                mdi-settings
-              </v-icon>
-            </v-btn>
+        <v-dialog
+            v-model="dialog"
+            :persistent="loading"
+            width="390"
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn class="edit-button" small icon v-bind="attrs" v-on="on"><v-icon>mdi-settings</v-icon></v-btn>
           </template>
-          <v-btn fab dark small color="green" @click="greenClick">
-            <v-icon v-if="!isEdit">mdi-pencil</v-icon>
-            <v-icon v-else>mdi-check</v-icon>
-          </v-btn>
-          <v-btn fab dark small color="red" @click="redClick">
-            <v-icon v-if="!isEdit">mdi-delete</v-icon>
-            <v-icon v-else>mdi-close</v-icon>
-          </v-btn>
-        </v-speed-dial>
+          <v-card class="indent" :loading="loading" :disabled="loading">
+            <v-main>
+              <v-card-title class="indent-bottom">
+                <span class="text-h5">Создание ответа</span>
+              </v-card-title>
+
+              <v-card-text class="indent-bottom">
+                <v-container class="pa-0">
+                  <v-autocomplete
+                      v-model="icon"
+                      :items="icons"
+                      rounded
+                      solo
+                      color="blue-grey lighten-2"
+                      label="Иконка"
+                      item-text="name"
+                      item-value="value"
+                  >
+                    <template v-slot:selection="data">
+                      <v-chip
+                          v-bind="data.attrs"
+                          :input-value="data.selected"
+                          @click="data.select"
+                      >
+                        <v-img class="mr-1" width="20" :src="'/img/'+ data.item.value + '.svg'"></v-img>
+                        {{ data.item.name }}
+                      </v-chip>
+                    </template>
+                    <template v-slot:item="data">
+                      <template v-if="typeof data.item !== 'object'">
+                        <v-list-item-content v-text="data.item"></v-list-item-content>
+                      </template>
+                      <template v-else>
+                        <v-list-item-avatar>
+                          <v-img class="mr-1" width="20" :src="'/img/'+ data.item.value + '.svg'"></v-img>
+                        </v-list-item-avatar>
+                        <v-list-item-content>
+                          <v-list-item-title v-html="data.item.name"></v-list-item-title>
+                          <v-list-item-subtitle v-html="data.item.group"></v-list-item-subtitle>
+                        </v-list-item-content>
+                      </template>
+                    </template>
+                  </v-autocomplete>
+                  <v-text-field class="field" required dense  outlined label="Название" v-model="name"/>
+                  <v-text-field class="field" dense hide-details outlined label="Ссылка" v-model="href"/>
+                </v-container>
+              </v-card-text>
+
+              <v-card-actions class="pa-0">
+                <v-spacer></v-spacer>
+                <v-btn
+                    color="blue darken-1"
+                    text
+                    @click="close"
+                >
+                  Отмена
+                </v-btn>
+                <v-btn
+                    color="blue darken-1"
+                    text
+                    @click="remove"
+                >
+                  Удалить
+                </v-btn>
+                <v-btn
+                    color="blue darken-1"
+                    text
+                    @click="save"
+                >
+                  Сохранить
+                </v-btn>
+              </v-card-actions>
+            </v-main>
+          </v-card>
+        </v-dialog>
       </v-col>
     </v-row>
   </v-card>
@@ -49,15 +105,18 @@ export default {
   data() {
     return {
       fab: false,
-      fieldRules: [
-          v => !!v || "Имя обязательно",
-          v => v.length <= 12 || 'Имя должно быть не более 12 символов',
-      ],
-      isEdit: false,
+      dialog: false,
+      loading: false,
       name: this.item.name,
       nameTemp: this.item.name,
       href: this.item.href,
-      hrefTemp: this.item.href
+      hrefTemp: this.item.href,
+      icons: [{ name: "Facebook", value:"facebook" }, { name: "Instagram", value:"instagram" }, { name: "Местоположение", value:"location" },
+        { name: "Messenger", value:"messenger" }, { name: "Одноклассники", value:"odnoklassniki" }, { name: "Reddit", value:"reddit" },
+        { name: "Сайт", value:"site" }, { name: "Skype", value:"skype" }, { name: "Snapchat", value:"snapchat" },
+        { name: "Telegram", value:"telegram" }, { name: "Tik-Tok", value:"tik-tok" }, { name: "Twitter", value:"twitter" },
+        { name: "ВК", value:"vkontakte" }, { name: "WhatsApp", value:"whatsapp" }, { name: "YouTube", value:"youtube" }],
+      icon: null
     }
   },
   watch: {
@@ -70,36 +129,40 @@ export default {
   },
   methods: {
     ...mapActions(["updateItemAction", "deleteItemAction"]),
-    greenClick() {
-      if(!this.isEdit)
-        this.isEdit = !this.isEdit;
-      else if(this.name.length <= 12) {
-        this.isEdit = false;
+    close() {
+      this.dialog = false;
+      this.item.name = this.nameTemp;
+      this.name = this.item.name;
 
-        this.nameTemp = this.name;
-        this.item.name = this.name;
+      this.item.href = this.hrefTemp;
+      this.href = this.item.href;
 
-        this.hrefTemp = this.href;
-        this.item.href = this.href;
-
-        this.item.name = this.name;
-        this.item.href = this.href;
-
-        this.updateItemAction();
-      }
+      this.loading = false;
+      this.icon = null;
     },
-    redClick() {
-      if(!this.isEdit)
-        this.deleteItemAction(this.item);
-      else {
-        this.isEdit = false;
+    async remove() {
+      this.loading = true;
 
-        this.item.name = this.nameTemp;
-        this.name = this.item.name;
+      await this.deleteItemAction(this.item);
 
-        this.item.href = this.hrefTemp;
-        this.href = this.item.href;
-      }
+      this.close();
+    },
+    async save() {
+      this.loading = true;
+      this.nameTemp = this.name;
+      this.item.name = this.name;
+
+      this.hrefTemp = this.href;
+      this.item.href = this.href;
+
+      this.item.name = this.name;
+      this.item.href = this.href;
+
+      this.item.icon = this.icon;
+
+      await this.updateItemAction();
+
+      this.close();
     }
   }
 }
@@ -133,5 +196,13 @@ export default {
 }
 .field {
   margin: 5px;
+}
+
+.indent {
+  padding: 30px;
+}
+
+.indent-bottom {
+  padding: 0 0 30px 0;
 }
 </style>

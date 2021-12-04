@@ -3,11 +3,13 @@
     <v-row no-gutters>
       <v-spacer/>
       <v-col class="pa-0" cols="auto">
-        <v-btn fab @click="$router.go(-1)">
-          <v-icon>
-            mdi-arrow-left
-          </v-icon>
-        </v-btn>
+        <router-link custom v-slot="{ href, navigate }" to="/">
+          <v-btn fab :href="href" @click="navigate">
+            <v-icon>
+              mdi-arrow-left
+            </v-icon>
+          </v-btn>
+        </router-link>
       </v-col>
     </v-row>
 
@@ -42,7 +44,7 @@ export default {
   },
   async mounted() {
     await this.getProfileFromServer();
-    if(this.getProfile.company !== null)
+    if(this.getProfile.company !== null && this.getCompany !== undefined)
       await this.getCompanyFromServer(this.getProfile.company.id);
     else {
       await this.getCompanyFromServer();

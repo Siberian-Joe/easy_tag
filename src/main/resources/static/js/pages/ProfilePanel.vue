@@ -29,7 +29,7 @@
             </v-col>
           </v-row>
           <v-row v-else no-gutters>
-            <v-text-field dense hide-details outlined label="Название" v-model="fullNameTemp" @keyup.enter="save"/>
+            <v-text-field dense hide-details outlined label="ФИО" v-model="fullNameTemp" @keyup.enter="save"/>
             <v-btn icon @click="save"><v-icon> mdi-check </v-icon></v-btn>
             <v-btn icon @click="cancel"><v-icon> mdi-close </v-icon></v-btn>
           </v-row>
@@ -82,11 +82,11 @@
           <v-col cols="auto">
             <v-icon class="icon icon-block" color="black" size="40">mdi-account-arrow-right</v-icon>
           </v-col>
-          <v-col class="pa-0">
+          <v-col class="pa-0" cols="10">
             <v-col class="pa-0" align-self="center">
               <v-card-text class="item-text indent-15px-bottom text-h6"> {{ getProfile.request.type.type === "CREATE" ? "Создание компании" : "Вопрос" }} </v-card-text>
             </v-col>
-            <v-col class="pa-0" align-self="center">
+            <v-col class="pa-0" cols="10" align-self="center">
               <v-card-text class="item-text pa-0"> {{ getProfile.request.description }} </v-card-text>
             </v-col>
           </v-col>
@@ -122,7 +122,7 @@
                   <v-card-text class="indent-bottom">
                     <v-container class="pa-0">
                       <v-col class="indent-bottom">
-                        <v-select outlined hide-details="auto" dense label="Тип запроса" v-model="typeOfRequest" :items="typesOfRequest"></v-select>
+                        <v-select outlined hide-details="auto" dense label="Тип запроса" v-model="typeOfRequest" :items="typesOfRequest" item-text="name" item-value="type"></v-select>
                       </v-col>
                       <v-col class="pa-0" cols="auto">
                         <v-text-field class="field" hide-details="auto" required dense outlined label="Описание" v-model="description"/>
@@ -160,11 +160,11 @@
           <v-col cols="auto">
             <v-icon class="icon icon-block" color="black" size="40">mdi-account-arrow-left</v-icon>
           </v-col>
-          <v-col class="pa-0">
+          <v-col class="pa-0" cols="10">
             <v-col class="pa-0" align-self="center">
               <v-card-text class="item-text indent-15px-bottom text-h6"> {{ getProfile.response.type.type !== "QUESTION" ? "Создание компании" : "Вопрос" }} </v-card-text>
             </v-col>
-            <v-col class="pa-0" align-self="center">
+            <v-col class="pa-0" align-self="center" cols="10">
               <v-card-text class="item-text pa-0"> {{ getProfile.response.description }} </v-card-text>
               <v-card-text class="item-text pa-0" v-if="getProfile.response.type.type !== 'QUESTION'"> Статус: {{ getProfile.response.type.type === "ACCEPTED" ? "Одобрено" : "Отклонено" }} </v-card-text>
             </v-col>
@@ -200,7 +200,7 @@ export default {
       isEditEmail: false,
       dialog: false,
       typeOfRequest: null,
-      typesOfRequest: ["Создание компании", "Вопрос"],
+      typesOfRequest: [],
       fullNameTemp: "",
       emailTemp: "",
       description: "",
@@ -210,12 +210,15 @@ export default {
       ],
     }
   },
+  async mounted() {
+    await this.getTypesOfRequestFromServer();
+    this.typesOfRequest = this.getTypesOfRequest;
+  },
   computed: {
-    ...mapGetters(["getProfile"]),
-    ...mapState(["profile"])
+    ...mapGetters(["getProfile", "getTypesOfRequest"])
   },
   methods: {
-    ...mapActions(["updateFullNameAction", "updateEmailAction", "postRequest"]),
+    ...mapActions(["updateFullNameAction", "updateEmailAction", "postRequest", "getTypesOfRequestFromServer"]),
     edit() {
       this.isEditFullName = !this.isEditFullName;
     },
@@ -227,7 +230,7 @@ export default {
     cancel() {
       this.isEditFullName = !this.isEditFullName;
 
-      this.fullNameTemp = this.profile.fullName;
+      this.fullNameTemp = this.getProfile.fullName;
     },
     greenClick() {
       this.isEditEmail = !this.isEditEmail;
@@ -238,7 +241,7 @@ export default {
       this.isEditEmail = !this.isEditEmail;
       this.fab = false;
 
-      this.emailTemp = this.profile.email;
+      this.emailTemp = this.getProfile.email;
     },
     closeDialog() {
       this.dialog = false;
@@ -247,10 +250,6 @@ export default {
     },
     saveDialog() {
       this.dialog = false;
-      if(this.typeOfRequest === "Создание компании")
-          this.typeOfRequest = "CREATE";
-      else
-        this.typeOfRequest = "QUESTION";
 
       this.postRequest({ description: this.description, type: this.typeOfRequest })
       this.typeOfRequest = null;
@@ -317,9 +316,5 @@ export default {
 
 .indent-bottom {
   padding: 0 0 30px 0;
-}
-
-.indent-left-right {
-  padding: 0 30px 0 30px;
 }
 </style>

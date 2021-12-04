@@ -5,6 +5,7 @@ import com.project.easy_tag.domains.User;
 import com.project.easy_tag.services.CompanyService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,11 +20,7 @@ public class CompanyController {
         return companyService.findById(id);
     }
 
-    @PostMapping
-    public Company save(@RequestBody Company company) {
-        return companyService.save(company);
-    }
-
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/create/{id}")
     public Company create(@PathVariable("id") User user, @RequestBody Company company) {
         return companyService.create(user, company);
@@ -31,12 +28,13 @@ public class CompanyController {
 
     @PutMapping("/{id}")
     public Company update(@PathVariable("id") Company companyFromDb, @RequestBody Company company) {
-        BeanUtils.copyProperties(company, companyFromDb, "id");
+        BeanUtils.copyProperties(company, companyFromDb, "id", "qrCode");
         return companyService.save(companyFromDb);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/{id}")
-    public void update(@PathVariable("id") User user) {
+    public void delete(@PathVariable("id") User user) {
         companyService.delete(user);
     }
 }

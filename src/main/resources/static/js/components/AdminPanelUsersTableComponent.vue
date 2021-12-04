@@ -7,9 +7,10 @@
     <template v-slot:top>
       <v-dialog
           v-model="dialog"
-          max-width="500px"
+          max-width="400px"
+          :persistent="loading"
       >
-        <v-card class="indent">
+        <v-card class="indent rounded-xl" :disabled="loading" :loading="loading">
           <v-main>
             <v-card-title class="indent-bottom">
               <span class="text-h5">Редактирование</span>
@@ -18,8 +19,8 @@
             <v-card-text class="indent-bottom">
               <v-container class="pa-0">
                 <v-row no-gutters align="center">
-                  <v-col class="pa-0">
-                    <v-select outlined hide-details="auto" label="Роль" v-model="editedItem.role" :items="getConvertedRoles"></v-select>
+                  <v-col class="pa-0" cols="auto">
+                    <v-select outlined hide-details="auto" label="Роль" v-model="editedItem.role" :items="roles" item-text="name" item-value="role"></v-select>
                   </v-col>
                   <v-col class="pa-0" cols="auto">
                     <v-row no-gutters align="center">
@@ -74,27 +75,26 @@ export default {
       roles: [],
       dialog: false,
       isAllowed: false,
+      loading: false,
       headers: [
         {
           text: "ФИО",
           align: "start",
           value: "fullName"
         },
-        { text: "Роль", value: "role" },
+        { text: "Роль", value: "role.name" },
         { text: "E-mail", value: "email" },
         { text: "Компания", value: "company.name" },
         { text: "Операции", value: "actions", sortable: false }
       ],
       editedIndex: -1,
       editedItem: {
-        fullName: "",
-        company: null,
-        email: ""
+        role: null,
+        company: null
       },
       defaultItem: {
-        fullName: '',
-        company: null,
-        email: ""
+        role: null,
+        company: null
       }
     }
   },
@@ -105,14 +105,7 @@ export default {
     this.roles = this.getRoles;
   },
   computed: {
-    ...mapGetters(["getUsers", "getRoles"]),
-    getConvertedRoles() {
-      let roles = [];
-      this.roles.forEach(role => {
-        roles.push(role.role);
-      })
-      return roles;
-    }
+    ...mapGetters(["getUsers", "getRoles"])
   },
   methods: {
     ...mapActions(["getUsersFromServer", "updateUserRoleAction", "getRolesFromServer", "deleteUserAction", "updateUserCompany", "deleteCompany"]),
@@ -132,25 +125,28 @@ export default {
         this.editedIndex = -1
       })
       this.isAllowed = false;
+      this.loading = false;
     },
     async save () {
+      this.loading = true;
       if(this.isAllowed && this.editedItem.company === null)
         this.editedItem.company = { name: "Название", items: []};
 
-      if (this.editedIndex > -1)
-        Object.assign(this.users[this.editedIndex], this.editedItem);
-      else
-        this.users.push(this.editedItem)
       this.roles.forEach(role => {
         if(role.role === this.editedItem.role)
           this.editedItem.role = role;
       });
 
+      if (this.editedIndex > -1)
+        Object.assign(this.users[this.editedIndex], this.editedItem);
+      else
+        this.users.push(this.editedItem)
+
       if(this.editedItem.company !== null && !this.isAllowed) {
         await this.deleteCompany(this.editedItem);
         this.users[this.editedIndex].company = null;
       }
-      else
+      else if (this.isAllowed)
         await this.updateUserCompany({user: this.editedItem, path: window.location.origin});
 
       await this.updateUserRoleAction(this.editedItem);
