@@ -9,11 +9,7 @@
         <label class="item-text"> {{ item.name }} </label>
       </v-col>
       <v-col v-if="editMode" cols="auto" align-self="center">
-        <v-dialog
-            v-model="dialog"
-            :persistent="loading"
-            width="390"
-        >
+        <v-dialog v-model="dialog" :persistent="loading" width="390">
           <template v-slot:activator="{ on, attrs }">
             <v-btn class="edit-button" small icon v-bind="attrs" v-on="on"><v-icon>mdi-settings</v-icon></v-btn>
           </template>
@@ -22,25 +18,11 @@
               <v-card-title class="indent-bottom">
                 <span class="text-h5">Создание ответа</span>
               </v-card-title>
-
               <v-card-text class="indent-bottom">
                 <v-container class="pa-0">
-                  <v-autocomplete
-                      v-model="icon"
-                      :items="icons"
-                      rounded
-                      solo
-                      color="blue-grey lighten-2"
-                      label="Иконка"
-                      item-text="name"
-                      item-value="value"
-                  >
+                  <v-autocomplete v-model="icon" :items="icons" rounded solo color="blue-grey lighten-2" label="Иконка" item-text="name" item-value="value">
                     <template v-slot:selection="data">
-                      <v-chip
-                          v-bind="data.attrs"
-                          :input-value="data.selected"
-                          @click="data.select"
-                      >
+                      <v-chip v-bind="data.attrs" :input-value="data.selected" @click="data.select">
                         <v-img class="mr-1" width="20" :src="'/img/'+ data.item.value + '.svg'"></v-img>
                         {{ data.item.name }}
                       </v-chip>
@@ -64,28 +46,15 @@
                   <v-text-field class="field" dense hide-details outlined label="Ссылка" v-model="href"/>
                 </v-container>
               </v-card-text>
-
               <v-card-actions class="pa-0">
                 <v-spacer></v-spacer>
-                <v-btn
-                    color="blue darken-1"
-                    text
-                    @click="close"
-                >
+                <v-btn color="blue darken-1" text @click="close">
                   Отмена
                 </v-btn>
-                <v-btn
-                    color="blue darken-1"
-                    text
-                    @click="remove"
-                >
+                <v-btn color="blue darken-1" text @click="remove">
                   Удалить
                 </v-btn>
-                <v-btn
-                    color="blue darken-1"
-                    text
-                    @click="save"
-                >
+                <v-btn color="blue darken-1" text @click="save">
                   Сохранить
                 </v-btn>
               </v-card-actions>

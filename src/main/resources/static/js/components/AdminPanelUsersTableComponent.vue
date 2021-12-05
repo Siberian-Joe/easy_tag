@@ -5,17 +5,12 @@
       class="elevation-1 rounded-xl"
   >
     <template v-slot:top>
-      <v-dialog
-          v-model="dialog"
-          max-width="400px"
-          :persistent="loading"
-      >
+      <v-dialog v-model="dialog" max-width="400px" :persistent="loading">
         <v-card class="indent rounded-xl" :disabled="loading" :loading="loading">
           <v-main>
             <v-card-title class="indent-bottom">
               <span class="text-h5">Редактирование</span>
             </v-card-title>
-
             <v-card-text class="indent-bottom">
               <v-container class="pa-0">
                 <v-row no-gutters align="center">
@@ -31,21 +26,12 @@
                 </v-row>
               </v-container>
             </v-card-text>
-
             <v-card-actions class="pa-0">
               <v-spacer></v-spacer>
-              <v-btn
-                  color="blue darken-1"
-                  text
-                  @click="close"
-              >
+              <v-btn color="blue darken-1" text @click="close">
                 Отмена
               </v-btn>
-              <v-btn
-                  color="blue darken-1"
-                  text
-                  @click="save"
-              >
+              <v-btn color="blue darken-1" text @click="save">
                 Сохранить
               </v-btn>
             </v-card-actions>
@@ -54,11 +40,7 @@
       </v-dialog>
     </template>
     <template v-slot:item.actions="{ item }">
-      <v-icon
-          small
-          class="mr-2"
-          @click="editItem(item)"
-      >
+      <v-icon small class="mr-2" @click="editItem(item)">
         mdi-pencil
       </v-icon>
     </template>
@@ -147,7 +129,7 @@ export default {
         this.users[this.editedIndex].company = null;
       }
       else if (this.isAllowed)
-        await this.updateUserCompany({user: this.editedItem, path: window.location.origin});
+        await this.updateUserCompany({ user: this.editedItem, path: window.location.origin });
 
       await this.updateUserRoleAction(this.editedItem);
 

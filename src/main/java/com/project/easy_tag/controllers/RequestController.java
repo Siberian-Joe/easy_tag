@@ -16,7 +16,6 @@ public class RequestController {
     @Autowired
     RequestService requestService;
 
-    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/types")
     public List<TypeOfRequest> typesOfRequest() {
         return requestService.findAllTypes();

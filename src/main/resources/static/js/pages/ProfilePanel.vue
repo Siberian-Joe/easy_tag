@@ -1,17 +1,6 @@
 <template>
   <v-container class="pa-0">
-    <v-row class="navigation-panel" no-gutters>
-      <v-spacer/>
-      <v-col class="pa-0" cols="auto">
-        <router-link custom v-slot="{ href, navigate }" to="/">
-          <v-btn fab :href="href" @click="navigate">
-            <v-icon>
-              mdi-arrow-left
-            </v-icon>
-          </v-btn>
-        </router-link>
-      </v-col>
-    </v-row>
+    <back-button-component/>
     <v-col class="indent pa-0" align="center">
       <v-col class="pa-0">
         <v-avatar size="150">
@@ -28,11 +17,11 @@
               <v-btn small icon @click="edit"><v-icon> mdi-pencil </v-icon></v-btn>
             </v-col>
           </v-row>
-          <v-row v-else no-gutters>
-            <v-text-field dense hide-details outlined label="ФИО" v-model="fullNameTemp" @keyup.enter="save"/>
+          <v-col class="pa-0" v-else no-gutters>
+            <v-text-field class="pa-0 ma-0" dense hide-details outlined label="ФИО" v-model="fullNameTemp" @keyup.enter="save"/>
             <v-btn icon @click="save"><v-icon> mdi-check </v-icon></v-btn>
             <v-btn icon @click="cancel"><v-icon> mdi-close </v-icon></v-btn>
-          </v-row>
+          </v-col>
         </v-card-text>
       </v-col>
     </v-col>
@@ -45,7 +34,7 @@
           <v-col class="pa-0" align-self="center">
             <label class="item-text" v-if="!isEditEmail"> {{ getProfile.email }} </label>
             <div v-else>
-              <v-text-field class="field" :rules="emailRules" hide-details="auto" required dense outlined label="E-mail" v-model="emailTemp"/>
+              <v-text-field class="field pa-0 ma-0" :rules="emailRules" hide-details="auto" required dense outlined label="E-mail" v-model="emailTemp"/>
             </div>
           </v-col>
           <v-col class="pa-0" cols="auto" align-self="center">
@@ -67,7 +56,7 @@
                 <v-icon>mdi-close</v-icon>
               </v-btn>
             </v-speed-dial>
-            <v-btn small icon @click="isEditEmail = !isEditEmail" v-else>
+            <v-btn small icon @click="editEmail" v-else>
               <v-icon>
                 mdi-settings
               </v-icon>
@@ -105,11 +94,7 @@
             </v-col>
           </v-col>
           <v-col class="pa-0" align-self="center" align="end" cols="auto">
-            <v-dialog
-                v-model="dialog"
-                persistent
-                width="290"
-            >
+            <v-dialog v-model="dialog" persistent width="290">
               <template v-slot:activator="{ on, attrs }">
                 <v-btn small icon v-bind="attrs" v-on="on"><v-icon>mdi-plus</v-icon></v-btn>
               </template>
@@ -118,32 +103,22 @@
                   <v-card-title class="indent-bottom">
                     <span class="text-h5">Создание запроса</span>
                   </v-card-title>
-
                   <v-card-text class="indent-bottom">
                     <v-container class="pa-0">
                       <v-col class="indent-bottom">
                         <v-select outlined hide-details="auto" dense label="Тип запроса" v-model="typeOfRequest" :items="typesOfRequest" item-text="name" item-value="type"></v-select>
                       </v-col>
                       <v-col class="pa-0" cols="auto">
-                        <v-text-field class="field" hide-details="auto" required dense outlined label="Описание" v-model="description"/>
+                        <v-text-field class="field pa-0 ma-0" hide-details="auto" required dense outlined label="Описание" v-model="description"/>
                       </v-col>
                     </v-container>
                   </v-card-text>
-
                   <v-card-actions class="pa-0">
                     <v-spacer></v-spacer>
-                    <v-btn
-                        color="blue darken-1"
-                        text
-                        @click="closeDialog"
-                    >
+                    <v-btn color="blue darken-1" text @click="closeDialog">
                       Отмена
                     </v-btn>
-                    <v-btn
-                        color="blue darken-1"
-                        text
-                        @click="saveDialog"
-                    >
+                    <v-btn color="blue darken-1" text @click="saveDialog">
                       Сохранить
                     </v-btn>
                   </v-card-actions>
@@ -190,9 +165,13 @@
 </template>
 
 <script>
-import {mapState, mapActions, mapGetters} from "vuex";
+import {mapActions, mapGetters} from "vuex";
+import BackButtonComponent from "../components/BackButtonComponent.vue";
 
 export default {
+  components: {
+    BackButtonComponent
+  },
   data() {
     return {
       fab: false,
@@ -221,6 +200,7 @@ export default {
     ...mapActions(["updateFullNameAction", "updateEmailAction", "postRequest", "getTypesOfRequestFromServer"]),
     edit() {
       this.isEditFullName = !this.isEditFullName;
+      this.fullNameTemp = this.getProfile.fullName;
     },
     save() {
       this.isEditFullName = !this.isEditFullName;
@@ -231,6 +211,10 @@ export default {
       this.isEditFullName = !this.isEditFullName;
 
       this.fullNameTemp = this.getProfile.fullName;
+    },
+    editEmail() {
+      this.isEditEmail = !this.isEditEmail;
+      this.emailTemp = this.getProfile.email;
     },
     greenClick() {
       this.isEditEmail = !this.isEditEmail;

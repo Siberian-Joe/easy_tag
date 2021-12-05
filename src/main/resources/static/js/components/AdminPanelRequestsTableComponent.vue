@@ -1,49 +1,28 @@
 <template>
-  <v-data-table
-      :headers="headers"
-      :items="users"
-      class="elevation-1 rounded-xl"
-  >
+  <v-data-table :headers="headers" :items="users" class="elevation-1 rounded-xl">
     <template v-slot:top>
-      <v-dialog
-          v-model="dialog"
-          :persistent="loading"
-          width="290"
-      >
-        <template v-slot:activator="{ on, attrs }">
-          <v-btn small icon v-bind="attrs" v-on="on"><v-icon>mdi-plus</v-icon></v-btn>
-        </template>
+      <v-dialog v-model="dialog" :persistent="loading" width="290">
         <v-card class="indent" :loading="loading" :disabled="loading">
           <v-main>
             <v-card-title class="indent-bottom">
               <span class="text-h5">Создание ответа</span>
             </v-card-title>
-
             <v-card-text class="indent-bottom">
               <v-container class="pa-0">
                 <v-col class="indent-bottom">
-                  <v-text-field class="field" hide-details="auto" required dense outlined label="Описание" v-model="description"/>
+                  <v-text-field class="field pa-0 ma-0" hide-details="auto" required dense outlined label="Описание" v-model="description"/>
                 </v-col>
                 <v-col class="pa-0" cols="auto">
                   <v-switch :disabled="disabled" inset v-model="accepted" :label="accepted ? 'Одобрено' : 'Отклонено'"/>
                 </v-col>
               </v-container>
             </v-card-text>
-
             <v-card-actions class="pa-0">
               <v-spacer></v-spacer>
-              <v-btn
-                  color="blue darken-1"
-                  text
-                  @click="close"
-              >
+              <v-btn color="blue darken-1" text @click="close">
                 Отмена
               </v-btn>
-              <v-btn
-                  color="blue darken-1"
-                  text
-                  @click="save"
-              >
+              <v-btn color="blue darken-1" text @click="save">
                 Сохранить
               </v-btn>
             </v-card-actions>
@@ -52,11 +31,7 @@
       </v-dialog>
     </template>
     <template v-slot:item.actions="{ item }">
-      <v-icon
-          small
-          class="mr-2"
-          @click="editItem(item)"
-      >
+      <v-icon small class="mr-2" @click="editItem(item)">
         mdi-pencil
       </v-icon>
     </template>
@@ -143,7 +118,8 @@ export default {
         type = "QUESTION";
 
       await this.sendResponse({ description: this.description, type: type, request: this.users[this.editedIndex].request});
-      await this.updateUserCompany({user: this.users[this.editedIndex], path: window.location.origin});
+      if(this.accepted)
+        await this.updateUserCompany({user: this.users[this.editedIndex], path: window.location.origin});
 
       this.users.splice(this.editedIndex, 1);
 

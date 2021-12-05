@@ -1,20 +1,7 @@
 <template>
   <v-container class="pa-0">
-    <v-row class="navigation-panel" no-gutters>
-      <v-spacer/>
-      <v-col class="pa-0" cols="auto">
-        <router-link custom v-slot="{ href, navigate }" to="/">
-          <v-btn fab :href="href" @click="navigate">
-            <v-icon>
-              mdi-close
-            </v-icon>
-          </v-btn>
-        </router-link>
-      </v-col>
-    </v-row>
-    <v-tabs
-        v-model="tab"
-    >
+    <back-button-component/>
+    <v-tabs v-model="tab">
       <v-tab>
         Панель администрации
       </v-tab>
@@ -22,7 +9,6 @@
         Панель запросов
       </v-tab>
     </v-tabs>
-
     <v-tabs-items v-model="tab">
       <v-tab-item>
         <v-card flat>
@@ -39,13 +25,13 @@
         </v-card>
       </v-tab-item>
     </v-tabs-items>
-
   </v-container>
 </template>
 
 <script>
 import AdminPanelUsersTableComponent from "../components/AdminPanelUsersTableComponent.vue";
 import AdminPanelRequestsTableComponent from "../components/AdminPanelRequestsTableComponent.vue";
+import BackButtonComponent from "../components/BackButtonComponent.vue";
 
 export default {
   data() {
@@ -55,13 +41,11 @@ export default {
   },
   components: {
     AdminPanelUsersTableComponent,
-    AdminPanelRequestsTableComponent
+    AdminPanelRequestsTableComponent,
+    BackButtonComponent
   }
 }
 </script>
 
 <style scoped>
-.navigation-panel {
-  padding-bottom: 30px;
-}
 </style>

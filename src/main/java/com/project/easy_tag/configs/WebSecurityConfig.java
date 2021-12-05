@@ -44,7 +44,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin().loginPage("/login").failureUrl("/login?error=true").and()
                 .authorizeRequests().antMatchers("/adminpanel**").hasAuthority("ADMIN").and()
                 .logout().logoutSuccessUrl("/").and()
-                .authorizeRequests().antMatchers("/", "/js/**", "/error**", "/img/**", "/company/**", "/user/**", "/login**", "/qrcode/**").permitAll().anyRequest().authenticated()
+                .authorizeRequests().antMatchers("/", "/js/**", "/error**", "/img/**", "/company/**", "/user/**", "/login**", "/qrcode/**", "/logo/**").permitAll().anyRequest().authenticated()
                 .and()
                 .httpBasic()
                 .and().sessionManagement().disable();

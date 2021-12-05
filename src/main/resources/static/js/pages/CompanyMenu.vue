@@ -2,10 +2,7 @@
   <v-container class="pa-0">
     <v-row no-gutters>
       <v-col class="pa-0" cols="auto">
-        <v-dialog
-            v-model="dialog"
-            width="550"
-        >
+        <v-dialog v-model="dialog" width="550">
           <template v-slot:activator="{ on, attrs }">
             <v-btn fab v-bind="attrs" v-on="on">
               <v-icon>

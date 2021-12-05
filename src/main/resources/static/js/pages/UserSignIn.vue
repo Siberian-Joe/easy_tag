@@ -1,17 +1,6 @@
 <template>
   <v-container class="pa-0">
-    <v-row class="navigation-panel" no-gutters>
-      <v-spacer/>
-      <v-col class="pa-0" cols="auto">
-        <router-link custom v-slot="{ href, navigate }" to="/">
-          <v-btn fab :href="href" @click="navigate">
-            <v-icon>
-              mdi-close
-            </v-icon>
-          </v-btn>
-        </router-link>
-      </v-col>
-    </v-row>
+    <back-button-component/>
     <v-card class="error-info rounded-xl" elevation="5" align="center" v-if="this.$route.query.error">
       <v-container class="pa-0">
         <v-card-text v-text="'Неверный E-mail или пароль'"/>
@@ -35,7 +24,12 @@
 </template>
 
 <script>
+import BackButtonComponent from "../components/BackButtonComponent.vue";
+
 export default {
+  components: {
+    BackButtonComponent
+  },
   data() {
     return {
       email: "",
@@ -54,14 +48,9 @@ export default {
   margin: 0 10px 0 10px;
 }
 
-.navigation-panel {
-  padding-bottom: 15px;
-}
-
 .error-info {
   background-color: #202548;
   color: #FFFFFF;
   margin: 15px 0 15px 0;
 }
-
 </style>

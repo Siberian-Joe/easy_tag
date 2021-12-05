@@ -9,8 +9,10 @@ import com.project.easy_tag.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 
 @Service
 public class CompanyService {
@@ -26,6 +28,9 @@ public class CompanyService {
 
     @Value("${qrcodes.path}")
     private String qr_code_path;
+
+    @Value("${logos.path}")
+    private String logos_path;
 
     public Company findById(String id) {
         return companyRepository.findById(id).orElse(null);
@@ -51,6 +56,27 @@ public class CompanyService {
     }
 
     public Company save(Company company) {
+        return companyRepository.save(company);
+    }
+
+    public Company saveLogo(Company company, MultipartFile file) {
+        File uploadDir = new File(logos_path);
+
+        if(!uploadDir.exists())
+            uploadDir.mkdir();
+        else if(company.getLogo() != null)
+            (new File(logos_path + company.getLogo())).delete();
+
+        String fileName = company.getId() + "." + file.getOriginalFilename();
+
+        try {
+            file.transferTo(new File(logos_path + fileName));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        company.setLogo(fileName);
+
         return companyRepository.save(company);
     }
 

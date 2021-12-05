@@ -7,6 +7,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/company/")
@@ -28,8 +29,13 @@ public class CompanyController {
 
     @PutMapping("/{id}")
     public Company update(@PathVariable("id") Company companyFromDb, @RequestBody Company company) {
-        BeanUtils.copyProperties(company, companyFromDb, "id", "qrCode");
+        BeanUtils.copyProperties(company, companyFromDb, "id", "qrCode", "logo");
         return companyService.save(companyFromDb);
+    }
+
+    @PostMapping("/logo/{id}")
+    public Company updateLogo(@PathVariable("id") Company company, @RequestParam("file") MultipartFile file) {
+        return companyService.saveLogo(company, file);
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")

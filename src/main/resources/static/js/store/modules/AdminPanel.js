@@ -35,20 +35,6 @@ export default {
         async updateUserRoleAction({ commit }, user) {
             await axios.put('/user/role/' + user.id + '/?id=' + user.role.id);
         },
-        async updateUserCompany({ commit, state }, body) {
-            let company;
-            await axios.post('/company/create/' + body.user.id, {
-                id: body.user.company.id,
-                name: body.user.company.name,
-                items: body.user.company.items
-            }).then(response => {
-                company = response.data;
-            });
-            if(body.user.id === state.profile.id)
-                commit( "setUserCompany", body.user.company);
-            if(company !== '')
-                await axios.get('/company/genrateqrcode/' + company.id + "/?path=" + body.path + "/?company=");
-        },
         async deleteCompany({ commit }, user) {
             await axios.delete('/company/' + user.id);
         },
@@ -58,13 +44,6 @@ export default {
         async sendResponse({ state }, response) {
             await axios.post('/response/' + response.request.id + "/?type=" + response.type, {
                 "description": response.description
-            });
-        },
-        async postRequest({ commit, state }, request) {
-            await axios.post('/request/' + state.profile.id + '/?type=' + request.type, {
-                description: request.description
-            }).then(response => {
-                commit("updateRequest", response.data);
             });
         },
         async getProfileFromServer({ commit }) {

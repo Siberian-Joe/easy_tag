@@ -1,17 +1,6 @@
 <template>
   <v-container class="pa-0">
-    <v-row class="navigation-panel" no-gutters>
-      <v-spacer/>
-      <v-col class="pa-0" cols="auto">
-        <router-link custom v-slot="{ href, navigate }" to="/login">
-          <v-btn fab :href="href" @click="navigate">
-            <v-icon>
-              mdi-arrow-left
-            </v-icon>
-          </v-btn>
-        </router-link>
-      </v-col>
-    </v-row>
+    <back-button-component/>
     <v-form ref="form" lazy-validation>
       <v-col class="indent" align="center">
         <v-text-field dense hide-details="auto" outlined :error-messages="errors" :rules="emailRules" label="E-mail" v-model="email" @keyup.enter=""/>
@@ -34,8 +23,12 @@
 
 <script>
 import axios from "axios";
+import BackButtonComponent from "../components/BackButtonComponent.vue";
 
 export default {
+  components: {
+    BackButtonComponent
+  },
   data() {
     return {
       email: "",
@@ -90,9 +83,5 @@ export default {
 
 .indent-buttons {
   margin: 0 10px 0 10px;
-}
-
-.navigation-panel {
-  padding-bottom: 15px;
 }
 </style>

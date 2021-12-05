@@ -37,6 +37,9 @@ export default {
         setCompanyNameMutation(state, name) {
             state.company.name = name;
         },
+        setCompanyLogoMutation(state, logo) {
+            state.company.logo = logo;
+        },
         setFullNameMutation(state, fullName) {
             state.profile.fullName = fullName;
         },
@@ -68,7 +71,6 @@ export default {
     },
     actions: {
         async setCompanyNameAction({ commit, state }, name) {
-
             await axios.put('/company/' + state.company.id, {
                 id: state.company.id,
                 name: name,
@@ -77,12 +79,18 @@ export default {
             commit( "setCompanyNameMutation", name);
             document.title = name;
         },
+        async setCompanyLogo({ commit, state }, file) {
+            let formData = new FormData();
+            formData.append("file", file);
+            await axios.post('/company/logo/' + state.company.id, formData).then(response => {
+                commit("setCompanyLogoMutation", response.data.logo);
+            });
+        },
         async updateFullNameAction({ commit, state }, fullName) {
             await axios.put('/user/' + state.profile.id, {
                 id: state.profile.id,
                 fullName: fullName,
                 email: state.profile.email,
-                company: state.profile.company
             });
             commit( "setFullNameMutation", fullName);
         },
@@ -90,8 +98,7 @@ export default {
             await axios.put('/user/' + state.profile.id, {
                 id: state.profile.id,
                 fullName: state.profile.fullName,
-                email: email,
-                company: state.profile.company
+                email: email
             });
             commit( "setEmailMutation", email);
         },
@@ -118,5 +125,26 @@ export default {
                 items: state.company.items
             });
         },
+        async postRequest({ commit, state }, request) {
+            await axios.post('/request/' + state.profile.id + '/?type=' + request.type, {
+                description: request.description
+            }).then(response => {
+                commit("updateRequest", response.data);
+            });
+        },
+        async updateUserCompany({ commit, state }, body) {
+            let company;
+            await axios.post('/company/create/' + body.user.id, {
+                id: body.user.company.id,
+                name: body.user.company.name,
+                items: body.user.company.items
+            }).then(response => {
+                company = response.data;
+            });
+            if(body.user.id === state.profile.id)
+                commit( "setUserCompany", body.user.company);
+            if(company !== '')
+                await axios.get('/company/genrateqrcode/' + company.id + "/?path=" + body.path + "/?company=");
+        }
     }
 }

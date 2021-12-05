@@ -15,6 +15,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Value("${qrcodes.path}")
     private String qr_code_path;
 
+    @Value("${logos.path}")
+    private String logos_path;
+
     @Bean
     public WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> webServerCustomizer() {
         return container -> {
@@ -26,5 +29,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/qrcode/**")
                 .addResourceLocations("file:///" + qr_code_path);
+        registry.addResourceHandler("/logo/**")
+                .addResourceLocations("file:///" + logos_path);
     }
 }

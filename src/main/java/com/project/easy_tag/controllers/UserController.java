@@ -35,7 +35,7 @@ public class UserController {
 
     @PutMapping("/{id}")
     public User update(@PathVariable("id") User userFromDb, @RequestBody User user) {
-        BeanUtils.copyProperties(user, userFromDb, "id", "password", "role");
+        BeanUtils.copyProperties(user, userFromDb, "id", "password", "company", "role", "request", "response");
         return userService.update(userFromDb);
     }
 

@@ -1,18 +1,6 @@
 <template>
   <v-container class="pa-0">
-    <v-row no-gutters>
-      <v-spacer/>
-      <v-col class="pa-0" cols="auto">
-        <router-link custom v-slot="{ href, navigate }" to="/">
-          <v-btn fab :href="href" @click="navigate">
-            <v-icon>
-              mdi-arrow-left
-            </v-icon>
-          </v-btn>
-        </router-link>
-      </v-col>
-    </v-row>
-
+    <back-button-component/>
     <v-container class="pa-0">
       <v-col class="indent pa-0">
         <company-title :name="getCompany.name" :logo="getCompany.logo" :editMode="editMode"/>
@@ -31,11 +19,13 @@
 import {mapActions, mapGetters} from 'vuex';
 import CompanyTitle from "../components/CompanyTitle.vue";
 import CompanyInformationList from "../components/CompanyInformationList.vue";
+import BackButtonComponent from "../components/BackButtonComponent.vue";
 
 export default {
   components: {
     CompanyTitle,
-    CompanyInformationList
+    CompanyInformationList,
+    BackButtonComponent
   },
   data() {
     return {
